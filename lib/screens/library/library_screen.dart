@@ -14,24 +14,12 @@ class LibraryScreen extends StatelessWidget {
         children: [
           BlocBuilder<LibraryBloc, LibraryState>(
             builder: (context, state) {
-              if (state.isLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              if (!state.isPermisionGranted) {
-                return const Center(
-                  child: Text(
-                    'isPermisionGranted: false',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30.0
-                    ),
-                  ),
-                );
-              }
+              if (state.isLoading) const LoadingIndicator();
+              if (!state.isPermisionGranted) const IsPermissionNoGranted();
+              if (state.allMedia.isEmpty) const NoMediaToShow();
               return CustomGridViewBuilder(
                 allMedia: state.allMedia,
+                scrollController: context.read<LibraryBloc>().scrollController,
               );
             },
           ),
@@ -41,6 +29,55 @@ class LibraryScreen extends StatelessWidget {
           ),
         ],
       )
+    );
+  }
+}
+
+class NoMediaToShow extends StatelessWidget {
+  const NoMediaToShow({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'No media to show',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 30.0
+        ),
+      ),
+    );
+  }
+}
+
+class IsPermissionNoGranted extends StatelessWidget {
+  const IsPermissionNoGranted({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'isPermisionGranted: false',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 30.0
+        ),
+      ),
+    );
+  }
+}
+
+class LoadingIndicator extends StatelessWidget {
+  const LoadingIndicator({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(),
     );
   }
 }
@@ -67,9 +104,10 @@ class TopButtons extends StatelessWidget {
               Text(
                 '8 May 2022',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 20.0),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 20.0
+                ),
               ),
               SizedBox(
                 height: 8.0,
@@ -77,9 +115,10 @@ class TopButtons extends StatelessWidget {
               Text(
                 'Home',
                 style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15.0,
-                    color: Colors.white),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15.0,
+                  color: Colors.white
+                ),
               ),
             ],
           ),
@@ -93,13 +132,16 @@ class TopButtons extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14.0),
                   ),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0, vertical: 6.0),
+                    horizontal: 12.0, 
+                    vertical: 6.0
+                  ),
                   child: const Text(
                     'Select',
                     style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13.0),
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13.0
+                    ),
                   ),
                 ),
               ),
@@ -109,12 +151,15 @@ class TopButtons extends StatelessWidget {
               GestureDetector(
                 onTap: () {},
                 child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey[800], shape: BoxShape.circle),
-                    padding: const EdgeInsets.all(2.0),
-                    child: const Icon(
-                      Icons.more_horiz,
-                    )),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800], 
+                    shape: BoxShape.circle
+                  ),
+                  padding: const EdgeInsets.all(2.0),
+                  child: const Icon(
+                    Icons.more_horiz,
+                  )
+                ),
               ),
             ],
           ),

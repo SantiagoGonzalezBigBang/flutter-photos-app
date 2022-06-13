@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:photos_app/blocs/blocs.dart';
 import 'package:photos_app/routes/routes.gr.dart';
 import 'package:photos_app/widgets/widgets.dart';
 
@@ -13,21 +15,26 @@ class MainScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return AutoTabsRouter(
-      routes: const [
-        LibraryRouter(),
-        ForYouRouter(),
-        AlbumsRouter(),
-        SearchRouter()
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => LibraryBloc())
       ],
-      builder: (context, child, animation) {
-        final tabsRouter = AutoTabsRouter.of(context);
-
-        return Scaffold(
-          body: child,
-          bottomNavigationBar: CustomBottomNavigationBar(tabsRouter: tabsRouter),
-        );
-      },
+      child: AutoTabsRouter(
+        routes: const [
+          LibraryRouter(),
+          ForYouRouter(),
+          AlbumsRouter(),
+          SearchRouter()
+        ],
+        builder: (context, child, animation) {
+          final tabsRouter = AutoTabsRouter.of(context);
+    
+          return Scaffold(
+            body: child,
+            bottomNavigationBar: CustomBottomNavigationBar(tabsRouter: tabsRouter),
+          );
+        },
+      ),
     );
   }
 }

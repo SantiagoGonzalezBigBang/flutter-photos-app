@@ -2,7 +2,7 @@ part of 'library_bloc.dart';
 
 class LibraryState extends Equatable {
   const LibraryState({
-    required this.isPermisionGranted,
+    this.isPermisionGranted = false,
     this.isLoading = true,
     this.imageAlbums = const [],
     this.videoAlbums = const [],

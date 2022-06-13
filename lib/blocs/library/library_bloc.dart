@@ -1,13 +1,16 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:photo_gallery/photo_gallery.dart';
+
+import 'package:photos_app/services/services.dart';
 
 part 'library_event.dart';
 part 'library_state.dart';
 
 class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
-  LibraryBloc(bool isInitialPermisionGranted) : super(LibraryState(isPermisionGranted: isInitialPermisionGranted)) {
+  LibraryBloc() : super(const LibraryState()) {
 
     on<LibrarySetIsLoadingEvent>(onLibrarySetIsLoadingEvent);
     on<LibrarySetPermissionGrantedEvent>(onLibrarySetPermissionGrantedEvent);
@@ -15,23 +18,28 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<LibrarySetVideoAlbumsEvent>(onLibrarySetVideoAlbumsEvent);
     on<LibrarySetAllMediaEvent>(onLibrarySetAllMediaEvent);
     
-    initLibraryBloc();
+    _initLibraryBloc();
   }
 
+  ScrollController scrollController = ScrollController();
+
   //* Init Bloc
-  void initLibraryBloc() async {
-    if (!state.isPermisionGranted) {
+  void _initLibraryBloc() async {
+    final bool isInitialPermisionGranted = await PermissionService.isPermissionGranted();
+
+    if (!isInitialPermisionGranted) {
       add(const LibrarySetIsLoadingEvent(false));
       add(const LibrarySetPermissionGrantedEvent(false));
       return;
     }
     List<Album> imageAlbums = await _getImageAlbum();
     List<Album> videoAlbums = await _getVideoAlbum();    
-    List<Medium> allMedia   = await getAndSortAllMedia([...imageAlbums, ...videoAlbums]);
+    List<Medium> allMedia   = await getAndSortAllMedia([imageAlbums[0], videoAlbums[0]]);
 
     add(LibrarySetImageAlbumsEvent(imageAlbums));
     add(LibrarySetVideoAlbumsEvent(videoAlbums));
     add(LibrarySetAllMediaEvent(allMedia));
+    add(const LibrarySetPermissionGrantedEvent(true));
     add(const LibrarySetIsLoadingEvent(false));
   }
 
@@ -74,8 +82,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     }
 
     allMedia.sort((a,b) {      
-      DateTime aDateTime = a.modifiedDate ?? a.creationDate ?? DateTime(1900);
-      DateTime bDateTime = b.modifiedDate ?? b.creationDate ?? DateTime(1900);
+      DateTime aDateTime = a.creationDate ?? DateTime(1900);
+      DateTime bDateTime = b.creationDate ?? DateTime(1900);
       return aDateTime.compareTo(bDateTime);      
     });
 
